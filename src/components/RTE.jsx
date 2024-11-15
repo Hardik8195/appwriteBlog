@@ -1,24 +1,22 @@
-import React from 'react'
-import {Editor } from '@tinymce/tinymce-react';
-import {Controller } from 'react-hook-form';
+import React from 'react';
+import { Editor } from '@tinymce/tinymce-react';
+import { Controller } from 'react-hook-form';
 
-
-export default function RTE({name, control, label, defaultValue =""}) {
+export default function RTE({ name, control, label, defaultValue = "" }) {
   return (
-    <div className='w-full'> 
-    {label && <label className='inline-block mb-1 pl-1'>{label}</label>}
+    <div className="w-full">
+      {label && <label className="inline-block mb-1 pl-1">{label}</label>}
 
-    <Controller
-    name={name || "content"}
-    control={control}
-    render={({field: {onChange}}) => (
-        <Editor
-        initialValue={defaultValue}
-        init={{
-            initialValue: defaultValue,
-            height: 500,
-            menubar: true,
-            plugins: [
+      <Controller
+        name={name || "content"}
+        control={control}
+        render={({ field: { onChange } }) => (
+          <Editor
+            initialValue={defaultValue}
+            init={{
+              height: 500,
+              menubar: true,
+              plugins: [
                 "image",
                 "advlist",
                 "autolink",
@@ -39,16 +37,25 @@ export default function RTE({name, control, label, defaultValue =""}) {
                 "help",
                 "wordcount",
                 "anchor",
-            ],
-            toolbar:
-            "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
-            content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
-        }}
-        onEditorChange={onChange}
-        />
-    )}
-    />
-
-     </div>
-  )
+              ],
+              toolbar:
+                "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help",
+              content_style:
+                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+              setup: (editor) => {
+                editor.on("input", () => {
+                  const content = editor.getContent({ format: "text" }); // Plain text content
+                  if (content.length > 255) {
+                    const trimmedContent = content.slice(0, 255); // Trim to 255 characters
+                    editor.setContent(trimmedContent); // Update the editor content
+                  }
+                });
+              },
+            }}
+            onEditorChange={onChange}
+          />
+        )}
+      />
+    </div>
+  );
 }
